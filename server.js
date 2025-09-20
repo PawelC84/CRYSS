@@ -21,6 +21,11 @@ app.use(express.json());
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.send('OK');
+});
+
 // Budget analysis endpoint
 app.post('/api/budget', async (req, res) => {
   try {
@@ -235,7 +240,8 @@ app.post('/api/vehicles', async (req, res) => {
 });
 
 // Serve React app for all non-API routes
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
+  if (req.path.startsWith('/api')) return res.status(404).end();
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
